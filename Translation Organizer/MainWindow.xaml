@@ -7,6 +7,60 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.ColumnSpan="2">
+            <MenuItem Header="_New"/>
+            <MenuItem Header="_Open"/>
+            <MenuItem Header="_Save"/>
+        </Menu>
+        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue"></ListBox>
+        <DockPanel Grid.Row="1" Grid.Column="1">
+            <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="10 5 10 0">
+                <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left"/>
+                <Button Content="Add Paragraph (_F)" DockPanel.Dock="Right"/>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom">
+                <DockPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Margin" Value="10"/>
+                    </Style>
+                </DockPanel.Resources>
+                <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left"/>
+                <Button Content="Next Sentence (_L)" DockPanel.Dock="Right"/>
+                <ComboBox VerticalAlignment="Center"></ComboBox>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">
+                <Button Content="Delete Sentence (_Z)" DockPanel.Dock="Left"/>
+                <Button Content="Add Sentence (_X)" DockPanel.Dock="Right"/>
+            </DockPanel>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="Margin" Value="10 5 10 10"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Label Content="_Japanese:" Target="{Binding ElementName=jpText}"/>
+                <TextBox Name="jpText" TextWrapping="Wrap" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+                <Label Content="_Romaji:" Target="{Binding ElementName=rmjText}" Grid.Row="2"/>
+                <TextBox Name="rmjText" TextWrapping="Wrap" Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+                <Label Content="_English:" Target="{Binding ElementName=enText}" Grid.Row="4"/>
+                <TextBox Name="enText" TextWrapping="Wrap" Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>
