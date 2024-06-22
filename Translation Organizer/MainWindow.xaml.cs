@@ -18,6 +18,8 @@ namespace Translation_Organizer
     {
         public MainWindow()
         {
+            ViewModel viewModel = new ViewModel();
+            DataContext = viewModel;
             InitializeComponent();
         }
     }

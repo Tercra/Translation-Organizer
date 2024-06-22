@@ -30,7 +30,6 @@ namespace Translation_Organizer
             enSentences.CollectionChanged += EnSentences_CollectionChanged;
         }
 
-
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged(string propertyName)
         {

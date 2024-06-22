@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Translation_Organizer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -16,11 +16,17 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Menu Grid.ColumnSpan="2">
-            <MenuItem Header="_New"/>
+            <MenuItem Header="_New" Command="{Binding NewCommand}"/>
             <MenuItem Header="_Open"/>
             <MenuItem Header="_Save"/>
         </Menu>
-        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue"></ListBox>
+        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding JpSentences}" TextWrapping="Wrap"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <DockPanel Grid.Row="1" Grid.Column="1">
             <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="10 5 10 0">
                 <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left"/>
@@ -44,6 +50,15 @@
                 <Grid.Resources>
                     <Style TargetType="{x:Type Grid}">
                         <Setter Property="Margin" Value="10 5 10 10"/>
+                    </Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Paragraphs}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False"/>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </Grid.Resources>
                 <Grid.RowDefinitions>
