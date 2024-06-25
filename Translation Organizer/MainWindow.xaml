@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:Translation_Organizer"
         mc:Ignorable="d"
         Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
+    <Window.Resources>
+        <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -20,10 +23,10 @@
             <MenuItem Header="_Open"/>
             <MenuItem Header="_Save"/>
         </Menu>
-        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}">
+        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding JpSentences}" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

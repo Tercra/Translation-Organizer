@@ -77,6 +77,7 @@ namespace Translation_Organizer
         public ViewModel()
         {
             newCommand = new CommandHandler(ExecuteNewCommand);
+            saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveCommand);
         }
 
         private class CommandHandler : ICommand
@@ -110,6 +111,7 @@ namespace Translation_Organizer
                 paragraphIndex = 0;
                 sentenceIndex = 0;
                 paragraphs = new ObservableCollection<ParagraphModel>();
+                paragraphs.Add(new ParagraphModel());
                 this.NotifyPropertyChanged(nameof(paragraphs));
                 return;
             }
@@ -126,6 +128,9 @@ namespace Translation_Organizer
                     paragraphIndex = 0;
                     sentenceIndex = 0;
                     paragraphs = new ObservableCollection<ParagraphModel>();
+                    paragraphs.Add(new ParagraphModel());
+                    this.NotifyPropertyChanged(nameof(paragraphIndex));
+                    this.NotifyPropertyChanged(nameof(sentenceIndex));
                     this.NotifyPropertyChanged(nameof(paragraphs));
                     break;
                 case MessageBoxResult.Cancel:
