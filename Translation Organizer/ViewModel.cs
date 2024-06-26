@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Translation_Organizer
@@ -27,7 +28,7 @@ namespace Translation_Organizer
             set
             {
                 title = value;
-                this.NotifyPropertyChanged(nameof(title));
+                this.NotifyPropertyChanged(nameof(Title));
             }
         }
         public int ParagraphIndex 
@@ -35,8 +36,13 @@ namespace Translation_Organizer
             get { return paragraphIndex; }
             set 
             { 
-                paragraphIndex = value; 
-                this.NotifyPropertyChanged(nameof(paragraphIndex));
+                if(value >= 0)
+                {
+                    //Any changes in paragraph would naturally change the sentenceIndex
+                    paragraphIndex = value;
+                    SentenceIndex = 0;
+                    this.NotifyPropertyChanged(nameof(ParagraphIndex));
+                }
             }
         }
         public int SentenceIndex
@@ -44,40 +50,98 @@ namespace Translation_Organizer
             get { return sentenceIndex; }
             set 
             { 
-                sentenceIndex = value; 
-                this.NotifyPropertyChanged(nameof(sentenceIndex));
+                if(value >= 0)
+                {
+                    sentenceIndex = value;
+                    this.NotifyPropertyChanged(nameof(SentenceIndex));
+                    this.NotifyPropertyChanged(nameof(SelectedJpSentence));
+                    this.NotifyPropertyChanged(nameof(SelectedRmjSentence));
+                    this.NotifyPropertyChanged(nameof(SelectedEnSentence));
+                    deleteSentenceCommand.InvokeCanExecuteChanged();
+                }
             }
         }
         public ObservableCollection<ParagraphModel> Paragraphs
         {
             get { return paragraphs; }
+            set 
+            { 
+                paragraphs = value;
+                this.NotifyPropertyChanged(nameof(Paragraphs));
+                addSentenceCommand.InvokeCanExecuteChanged();
+                deleteSentenceCommand.InvokeCanExecuteChanged();
+            }
         }
+        //Wrapper Properties (In order to bind to selected items)
+        public string SelectedJpSentence
+        {
+            get 
+            {
+                if(paragraphs == null)
+                {
+                    return "";
+                }
+                return paragraphs[paragraphIndex].JpSentences[sentenceIndex]; 
+            }
+            set { paragraphs[paragraphIndex].JpSentences[sentenceIndex] = value; }
+        }
+        public string SelectedRmjSentence
+        {
+            get 
+            {
+                if (paragraphs == null)
+                {
+                    return "";
+                }
+                return paragraphs[paragraphIndex].RmjSentences[sentenceIndex]; 
+            }
+            set { paragraphs[paragraphIndex].RmjSentences[sentenceIndex] = value; }
+        }
+        public string SelectedEnSentence
+        {
+            get 
+            {
+                if (paragraphs == null)
+                {
+                    return "";
+                }
+                return paragraphs[paragraphIndex].EnSentences[sentenceIndex]; 
+            }
+            set { paragraphs[paragraphIndex].EnSentences[sentenceIndex] = value; }
+        }
+
 
 
         //Command Properties
-        private ICommand newCommand;
-        private ICommand saveCommand;
+        private CommandHandler newCommand;
+        private CommandHandler saveCommand;
+        private CommandHandler addSentenceCommand;
+        private CommandHandler deleteSentenceCommand;
 
         public ICommand NewCommand
         {
-            get
-            {
-                return newCommand;
-            }
+            get { return newCommand; }
         }
         public ICommand SaveCommand
         {
-            get
-            {
-                return saveCommand;
-            }
+            get { return saveCommand; }
+        }
+        public ICommand AddSentenceCommand
+        {
+            get { return addSentenceCommand; }
+        }
+        public ICommand DeleteSentenceCommand
+        {
+            get { return deleteSentenceCommand; }
         }
 
         //Constructor
         public ViewModel()
         {
             newCommand = new CommandHandler(ExecuteNewCommand);
-            saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveCommand);
+            saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteIfProjectCommand);
+            addSentenceCommand = new CommandHandler(ExecuteAddSentenceCommand, CanExecuteIfProjectCommand);
+            deleteSentenceCommand = new CommandHandler(ExecuteDeleteSentenceCommand, CanExecuteDeleteSentenceCommand);
         }
 
         private class CommandHandler : ICommand
@@ -100,6 +164,22 @@ namespace Translation_Organizer
             public event EventHandler? CanExecuteChanged;
 
             public void Execute(object parameter) => executeAction(parameter);
+
+            public void InvokeCanExecuteChanged()
+            {
+                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        //The command canexecution function that will only work if a project is open/exists
+        private bool CanExecuteIfProjectCommand(object commandParameter)
+        {
+            //If there is an project then you can save, if not you cannot
+            if (paragraphs == null)
+            {
+                return false;
+            }
+            return true;
         }
 
         //NewCommand Functions
@@ -108,11 +188,8 @@ namespace Translation_Organizer
             // Check if there is an ongoing project. If not just create the new project
             if(paragraphs == null)
             {
-                paragraphIndex = 0;
-                sentenceIndex = 0;
-                paragraphs = new ObservableCollection<ParagraphModel>();
-                paragraphs.Add(new ParagraphModel());
-                this.NotifyPropertyChanged(nameof(paragraphs));
+                ParagraphIndex = 0;
+                Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
                 return;
             }
 
@@ -125,13 +202,8 @@ namespace Translation_Organizer
                     break;
                 case MessageBoxResult.No:
                     //Start new project without saving
-                    paragraphIndex = 0;
-                    sentenceIndex = 0;
-                    paragraphs = new ObservableCollection<ParagraphModel>();
-                    paragraphs.Add(new ParagraphModel());
-                    this.NotifyPropertyChanged(nameof(paragraphIndex));
-                    this.NotifyPropertyChanged(nameof(sentenceIndex));
-                    this.NotifyPropertyChanged(nameof(paragraphs));
+                    ParagraphIndex = 0;
+                    Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
                     break;
                 case MessageBoxResult.Cancel:
                     //Nothing happens
@@ -150,10 +222,39 @@ namespace Translation_Organizer
              */
         }
 
-        private bool CanExecuteSaveCommand(object commandParameter)
+        //Add sentence command
+        public void ExecuteAddSentenceCommand(object commandParameter)
         {
-            //If there is an project then you can save, if not you cannot
-            if (paragraphs == null)
+            paragraphs[paragraphIndex].JpSentences.Insert(sentenceIndex+1, "");
+            paragraphs[paragraphIndex].RmjSentences.Insert(sentenceIndex+1, "");
+            paragraphs[paragraphIndex].EnSentences.Insert(sentenceIndex+1, "");
+            SentenceIndex++;
+        }
+
+        //Delete Sentence command
+        public void ExecuteDeleteSentenceCommand(object commandParameter)
+        {
+            if(sentenceIndex == paragraphs[paragraphIndex].JpSentences.Count - 1)
+            {
+                paragraphs[paragraphIndex].JpSentences.RemoveAt(sentenceIndex);
+                paragraphs[paragraphIndex].RmjSentences.RemoveAt(sentenceIndex);
+                paragraphs[paragraphIndex].EnSentences.RemoveAt(sentenceIndex);
+                SentenceIndex--;
+                return;
+            }
+            paragraphs[paragraphIndex].JpSentences.RemoveAt(sentenceIndex);
+            paragraphs[paragraphIndex].RmjSentences.RemoveAt(sentenceIndex);
+            paragraphs[paragraphIndex].EnSentences.RemoveAt(sentenceIndex);
+            //In order to call the property change notification and the set off the can execute properties
+            SentenceIndex = SentenceIndex;
+        }
+        public bool CanExecuteDeleteSentenceCommand(object commandParameter)
+        {
+            if(paragraphs == null)
+            {
+                return false;
+            }
+            if(paragraphs[ParagraphIndex].JpSentences.Count == 1)
             {
                 return false;
             }

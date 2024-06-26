@@ -22,11 +22,11 @@ namespace Translation_Organizer
 
         public ParagraphModel()
         {
-            jpSentences = new ObservableCollection<string>();
+            jpSentences = new ObservableCollection<string>() { "" };
             jpSentences.CollectionChanged += JpSentences_CollectionChanged;
-            rmjSentences = new ObservableCollection<string>();
+            rmjSentences = new ObservableCollection<string>() { "" };
             rmjSentences.CollectionChanged += RmjSentences_CollectionChanged;
-            enSentences = new ObservableCollection<string>();
+            enSentences = new ObservableCollection<string>() { "" };
             enSentences.CollectionChanged += EnSentences_CollectionChanged;
         }
 

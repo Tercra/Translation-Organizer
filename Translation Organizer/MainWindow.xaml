@@ -8,6 +8,7 @@
         Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
     <Window.Resources>
         <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
+        <local:IndicesToSentenceConverter x:Key="IndicesToSentenceConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -23,7 +24,7 @@
             <MenuItem Header="_Open"/>
             <MenuItem Header="_Save"/>
         </Menu>
-        <ListBox Grid.Row="1" Name="paraListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}">
+        <ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
@@ -43,11 +44,11 @@
                 </DockPanel.Resources>
                 <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left"/>
                 <Button Content="Next Sentence (_L)" DockPanel.Dock="Right"/>
-                <ComboBox VerticalAlignment="Center"></ComboBox>
+                <ComboBox VerticalAlignment="Center" ItemsSource="{Binding ElementName=paragraphListBox, Path=SelectedItem.JpSentences}" SelectedIndex="{Binding SentenceIndex}"/>
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">
-                <Button Content="Delete Sentence (_Z)" DockPanel.Dock="Left"/>
-                <Button Content="Add Sentence (_X)" DockPanel.Dock="Right"/>
+                <Button Content="Delete Sentence (_Z)" DockPanel.Dock="Left" Command="{Binding DeleteSentenceCommand}"/>
+                <Button Content="Add Sentence (_X)" DockPanel.Dock="Right" Command="{Binding AddSentenceCommand}"/>
             </DockPanel>
             <Grid>
                 <Grid.Resources>
@@ -73,11 +74,11 @@
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
                 <Label Content="_Japanese:" Target="{Binding ElementName=jpText}"/>
-                <TextBox Name="jpText" TextWrapping="Wrap" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+                <TextBox Name="jpText" TextWrapping="Wrap" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Text="{Binding SelectedJpSentence, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label Content="_Romaji:" Target="{Binding ElementName=rmjText}" Grid.Row="2"/>
-                <TextBox Name="rmjText" TextWrapping="Wrap" Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+                <TextBox Name="rmjText" TextWrapping="Wrap" Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Text="{Binding SelectedRmjSentence, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label Content="_English:" Target="{Binding ElementName=enText}" Grid.Row="4"/>
-                <TextBox Name="enText" TextWrapping="Wrap" Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+                <TextBox Name="enText" TextWrapping="Wrap" Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Text="{Binding SelectedEnSentence, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </DockPanel>
     </Grid>
