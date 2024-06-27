@@ -42,8 +42,8 @@
                         <Setter Property="Margin" Value="10"/>
                     </Style>
                 </DockPanel.Resources>
-                <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left"/>
-                <Button Content="Next Sentence (_L)" DockPanel.Dock="Right"/>
+                <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left" Command="{Binding PrevSentenceCommand}"/>
+                <Button Content="Next Sentence (_L)" DockPanel.Dock="Right" Command="{Binding NextSentenceCommand}"/>
                 <ComboBox VerticalAlignment="Center" ItemsSource="{Binding ElementName=paragraphListBox, Path=SelectedItem.JpSentences}" SelectedIndex="{Binding SentenceIndex}"/>
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">

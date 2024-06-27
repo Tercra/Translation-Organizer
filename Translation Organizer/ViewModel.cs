@@ -58,6 +58,8 @@ namespace Translation_Organizer
                     this.NotifyPropertyChanged(nameof(SelectedRmjSentence));
                     this.NotifyPropertyChanged(nameof(SelectedEnSentence));
                     deleteSentenceCommand.InvokeCanExecuteChanged();
+                    prevSentenceCommand.InvokeCanExecuteChanged();
+                    nextSentenceCommand.InvokeCanExecuteChanged();
                 }
             }
         }
@@ -70,6 +72,8 @@ namespace Translation_Organizer
                 this.NotifyPropertyChanged(nameof(Paragraphs));
                 addSentenceCommand.InvokeCanExecuteChanged();
                 deleteSentenceCommand.InvokeCanExecuteChanged();
+                prevSentenceCommand.InvokeCanExecuteChanged();
+                nextSentenceCommand.InvokeCanExecuteChanged();
             }
         }
         //Wrapper Properties (In order to bind to selected items)
@@ -117,6 +121,8 @@ namespace Translation_Organizer
         private CommandHandler saveCommand;
         private CommandHandler addSentenceCommand;
         private CommandHandler deleteSentenceCommand;
+        private CommandHandler prevSentenceCommand;
+        private CommandHandler nextSentenceCommand;
 
         public ICommand NewCommand
         {
@@ -134,6 +140,14 @@ namespace Translation_Organizer
         {
             get { return deleteSentenceCommand; }
         }
+        public ICommand PrevSentenceCommand
+        {
+            get { return prevSentenceCommand; }
+        }
+        public ICommand NextSentenceCommand
+        {
+            get { return nextSentenceCommand; }
+        }
 
         //Constructor
         public ViewModel()
@@ -142,6 +156,8 @@ namespace Translation_Organizer
             saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteIfProjectCommand);
             addSentenceCommand = new CommandHandler(ExecuteAddSentenceCommand, CanExecuteIfProjectCommand);
             deleteSentenceCommand = new CommandHandler(ExecuteDeleteSentenceCommand, CanExecuteDeleteSentenceCommand);
+            prevSentenceCommand = new CommandHandler(ExecutePrevSentenceCommand, CanExecutePrevSentenceCommand);
+            nextSentenceCommand = new CommandHandler(ExecuteNextSentenceCommand, CanExecuteNextSentenceCommand);
         }
 
         private class CommandHandler : ICommand
@@ -202,8 +218,8 @@ namespace Translation_Organizer
                     break;
                 case MessageBoxResult.No:
                     //Start new project without saving
-                    ParagraphIndex = 0;
                     Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
+                    ParagraphIndex = 0;
                     break;
                 case MessageBoxResult.Cancel:
                     //Nothing happens
@@ -250,11 +266,32 @@ namespace Translation_Organizer
         }
         public bool CanExecuteDeleteSentenceCommand(object commandParameter)
         {
-            if(paragraphs == null)
+            if(paragraphs == null || paragraphs[ParagraphIndex].JpSentences.Count == 1)
             {
                 return false;
             }
-            if(paragraphs[ParagraphIndex].JpSentences.Count == 1)
+            return true;
+        }
+        //Previous/Next Sentence Commands
+        public void ExecutePrevSentenceCommand(object commandParameter)
+        {
+            SentenceIndex--;
+        }
+        public bool CanExecutePrevSentenceCommand(object commandParameter)
+        {
+            if(paragraphs == null || sentenceIndex == 0)
+            {
+                return false;
+            }
+            return true;
+        }
+        public void ExecuteNextSentenceCommand(object commandParameter)
+        {
+            SentenceIndex++;
+        }
+        public bool CanExecuteNextSentenceCommand(object commandParameter)
+        {
+            if(paragraphs == null || sentenceIndex == (paragraphs[paragraphIndex].JpSentences.Count - 1))
             {
                 return false;
             }
