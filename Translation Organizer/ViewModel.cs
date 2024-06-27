@@ -42,6 +42,7 @@ namespace Translation_Organizer
                     paragraphIndex = value;
                     SentenceIndex = 0;
                     this.NotifyPropertyChanged(nameof(ParagraphIndex));
+                    deleteParagraphCommand.InvokeCanExecuteChanged();
                 }
             }
         }
@@ -74,6 +75,8 @@ namespace Translation_Organizer
                 deleteSentenceCommand.InvokeCanExecuteChanged();
                 prevSentenceCommand.InvokeCanExecuteChanged();
                 nextSentenceCommand.InvokeCanExecuteChanged();
+                addParagraphCommand.InvokeCanExecuteChanged();
+                deleteParagraphCommand.InvokeCanExecuteChanged();
             }
         }
         //Wrapper Properties (In order to bind to selected items)
@@ -123,6 +126,8 @@ namespace Translation_Organizer
         private CommandHandler deleteSentenceCommand;
         private CommandHandler prevSentenceCommand;
         private CommandHandler nextSentenceCommand;
+        private CommandHandler addParagraphCommand;
+        private CommandHandler deleteParagraphCommand;
 
         public ICommand NewCommand
         {
@@ -148,6 +153,14 @@ namespace Translation_Organizer
         {
             get { return nextSentenceCommand; }
         }
+        public ICommand AddParagraphCommand
+        {
+            get { return addParagraphCommand; }
+        }
+        public ICommand DeleteParagraphCommand
+        {
+            get { return deleteParagraphCommand; }
+        }
 
         //Constructor
         public ViewModel()
@@ -158,6 +171,8 @@ namespace Translation_Organizer
             deleteSentenceCommand = new CommandHandler(ExecuteDeleteSentenceCommand, CanExecuteDeleteSentenceCommand);
             prevSentenceCommand = new CommandHandler(ExecutePrevSentenceCommand, CanExecutePrevSentenceCommand);
             nextSentenceCommand = new CommandHandler(ExecuteNextSentenceCommand, CanExecuteNextSentenceCommand);
+            addParagraphCommand = new CommandHandler(ExecuteAddParagraphCommand, CanExecuteIfProjectCommand);
+            deleteParagraphCommand = new CommandHandler(ExecuteDeleteParagraphCommand, CanExecuteDeleteParagraphCommand);
         }
 
         private class CommandHandler : ICommand
@@ -292,6 +307,32 @@ namespace Translation_Organizer
         public bool CanExecuteNextSentenceCommand(object commandParameter)
         {
             if(paragraphs == null || sentenceIndex == (paragraphs[paragraphIndex].JpSentences.Count - 1))
+            {
+                return false;
+            }
+            return true;
+        }
+        //Add paragraph/ delete paragraph commands
+        public void ExecuteAddParagraphCommand(object commandParameter)
+        {
+            paragraphs.Insert(paragraphIndex + 1, new ParagraphModel());
+            ParagraphIndex++;
+        }
+        public void ExecuteDeleteParagraphCommand(object commandParameter)
+        {
+            if(paragraphIndex == paragraphs.Count - 1)
+            {
+                paragraphs.RemoveAt(paragraphIndex);
+                ParagraphIndex--;
+                return;
+            }
+            paragraphs.RemoveAt(paragraphIndex);
+            //To send the notifications of property changes
+            ParagraphIndex = ParagraphIndex;
+        }
+        public bool CanExecuteDeleteParagraphCommand(object commandParameter)
+        {
+            if(paragraphs == null || paragraphs.Count == 1)
             {
                 return false;
             }

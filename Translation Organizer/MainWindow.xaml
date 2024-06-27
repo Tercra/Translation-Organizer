@@ -33,8 +33,8 @@
         </ListBox>
         <DockPanel Grid.Row="1" Grid.Column="1">
             <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="10 5 10 0">
-                <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left"/>
-                <Button Content="Add Paragraph (_F)" DockPanel.Dock="Right"/>
+                <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left" Command="{Binding DeleteParagraphCommand}"/>
+                <Button Content="Add Paragraph (_F)" DockPanel.Dock="Right" Command="{Binding AddParagraphCommand}"/>
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom">
                 <DockPanel.Resources>
