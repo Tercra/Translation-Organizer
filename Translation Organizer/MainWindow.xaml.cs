@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.Win32;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,6 +22,70 @@ namespace Translation_Organizer
             ViewModel viewModel = new ViewModel();
             DataContext = viewModel;
             InitializeComponent();
+        }
+
+        private void NewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as ViewModel;
+            if(viewModel == null)
+            {
+                return;
+            }
+            if(viewModel.BlankNewCommand.CanExecute(null))
+            {
+                viewModel.BlankNewCommand.Execute(null);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show("Would you like to save the current project?", "Save Before Starting Anew", MessageBoxButton.YesNoCancel);
+            if(result == MessageBoxResult.Yes)
+            {
+                if (viewModel.SaveAsCommand.CanExecute(null))
+                {
+                    //Get result from savedialoguebox and give it to SaveAsCommand
+                    SaveFileDialog saveFileDialog = new SaveFileDialog();
+                    saveFileDialog.FileName = "Project";
+                    saveFileDialog.DefaultExt = ".txt";
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        viewModel.SaveAsCommand.Execute(saveFileDialog);
+                    }
+                    else { return; }    //Does not make a new project if the save dialogue returns false
+                }
+                else if (viewModel.SaveCommand.CanExecute(null))    //else if here and not in save event handler because it was handled by returned and cannot be here
+                {
+                    viewModel.SaveCommand.Execute(null);
+                }
+            }
+            if(result != MessageBoxResult.Cancel)
+            {
+                viewModel.NewCommand.Execute(null);
+            }
+        }
+
+        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as ViewModel;
+            if(viewModel == null)
+            {
+                return;
+            }
+            if(viewModel.SaveAsCommand.CanExecute(null))
+            {
+                //Get result from savedialoguebox and give it to SaveAsCommand
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.FileName = "Project";
+                saveFileDialog.DefaultExt = ".txt";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    viewModel.SaveAsCommand.Execute(saveFileDialog);
+                }
+                return;
+            }
+            if (viewModel.SaveCommand.CanExecute(null))
+            {
+                viewModel.SaveCommand.Execute(null);
+            }
         }
     }
 }

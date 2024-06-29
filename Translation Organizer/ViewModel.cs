@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Serialization;
 
 namespace Translation_Organizer
 {
@@ -15,6 +18,7 @@ namespace Translation_Organizer
     {
         //Variable Properties
         private string title;
+        private string saveFilePath;
         private int paragraphIndex;
         private int sentenceIndex;
         private ObservableCollection<ParagraphModel> paragraphs;
@@ -90,7 +94,11 @@ namespace Translation_Organizer
                 }
                 return paragraphs[paragraphIndex].JpSentences[sentenceIndex]; 
             }
-            set { paragraphs[paragraphIndex].JpSentences[sentenceIndex] = value; }
+            set 
+            { 
+                paragraphs[paragraphIndex].JpSentences[sentenceIndex] = value;
+                MakeProjectUnsaved();
+            }
         }
         public string SelectedRmjSentence
         {
@@ -102,7 +110,11 @@ namespace Translation_Organizer
                 }
                 return paragraphs[paragraphIndex].RmjSentences[sentenceIndex]; 
             }
-            set { paragraphs[paragraphIndex].RmjSentences[sentenceIndex] = value; }
+            set 
+            { 
+                paragraphs[paragraphIndex].RmjSentences[sentenceIndex] = value;
+                MakeProjectUnsaved();
+            }
         }
         public string SelectedEnSentence
         {
@@ -114,13 +126,19 @@ namespace Translation_Organizer
                 }
                 return paragraphs[paragraphIndex].EnSentences[sentenceIndex]; 
             }
-            set { paragraphs[paragraphIndex].EnSentences[sentenceIndex] = value; }
+            set 
+            { 
+                paragraphs[paragraphIndex].EnSentences[sentenceIndex] = value;
+                MakeProjectUnsaved();
+            }
         }
 
 
 
         //Command Properties
+        private CommandHandler blankNewCommand;
         private CommandHandler newCommand;
+        private CommandHandler saveAsCommand;
         private CommandHandler saveCommand;
         private CommandHandler addSentenceCommand;
         private CommandHandler deleteSentenceCommand;
@@ -129,9 +147,17 @@ namespace Translation_Organizer
         private CommandHandler addParagraphCommand;
         private CommandHandler deleteParagraphCommand;
 
+        public ICommand BlankNewCommand
+        {
+            get { return blankNewCommand; }
+        }
         public ICommand NewCommand
         {
             get { return newCommand; }
+        }
+        public ICommand SaveAsCommand
+        {
+            get { return saveAsCommand; }
         }
         public ICommand SaveCommand
         {
@@ -165,8 +191,10 @@ namespace Translation_Organizer
         //Constructor
         public ViewModel()
         {
+            blankNewCommand = new CommandHandler(ExecuteNewCommand, CanExecuteBlankNewCommand);
             newCommand = new CommandHandler(ExecuteNewCommand);
-            saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteIfProjectCommand);
+            saveAsCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveAsCommand);
+            saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveCommand);
             addSentenceCommand = new CommandHandler(ExecuteAddSentenceCommand, CanExecuteIfProjectCommand);
             deleteSentenceCommand = new CommandHandler(ExecuteDeleteSentenceCommand, CanExecuteDeleteSentenceCommand);
             prevSentenceCommand = new CommandHandler(ExecutePrevSentenceCommand, CanExecutePrevSentenceCommand);
@@ -214,48 +242,81 @@ namespace Translation_Organizer
         }
 
         //NewCommand Functions
-        private void ExecuteNewCommand(object commandParameter)
+        //The Newcommand  condition that fires when there is no existing project
+        private bool CanExecuteBlankNewCommand(object commandParameter)
         {
-            // Check if there is an ongoing project. If not just create the new project
             if(paragraphs == null)
             {
-                ParagraphIndex = 0;
-                Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
-                return;
+                return true;
             }
-
-            //If yes ask the user if they want to save the current project or cancel
-            MessageBoxResult result = MessageBox.Show("Would you like to save the current project?", "Save Before Starting Anew", MessageBoxButton.YesNoCancel);
-            switch (result)
-            {
-                case MessageBoxResult.Yes:
-                    //Save before starting new project
-                    break;
-                case MessageBoxResult.No:
-                    //Start new project without saving
-                    Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
-                    ParagraphIndex = 0;
-                    break;
-                case MessageBoxResult.Cancel:
-                    //Nothing happens
-                    break;
-            }
+            return false;
+        }
+        //The NewCommand that fires when there is an existing project
+        private void ExecuteNewCommand(object commandParameter)
+        {
+            Title = "*";
+            saveFilePath = "";
+            Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
+            ParagraphIndex = 0;
         }
 
         //Save Command Functions
+        private bool CanExecuteSaveAsCommand(object commandParameter)
+        {
+            if (paragraphs == null || string.IsNullOrEmpty(saveFilePath) == false)  //saveFilePath check is for if the project has been saved before
+            {
+                return false;
+            }
+            return true;
+        }
+        //Save command will be the same for both saveAs and save commands just the difference of whether the title/file name is there or not
         private void ExecuteSaveCommand(object commandParameter)
         {
-            /*
-             * Open up the save dialogue box
-             * Check the result of the box
-             * if there is a file location then check for duplicate
-             * if duplicate ask user if they would like to overwrite
-             */
+            //SaveAs command only
+            if (commandParameter != null && string.IsNullOrEmpty(saveFilePath))
+            {
+                SaveFileDialog saveFileDialog = (SaveFileDialog)commandParameter;
+                Title = saveFileDialog.SafeFileName;
+                saveFilePath = saveFileDialog.FileName;
+            }
+
+            //Rest of save is shared by both save and saveAs commands
+            using(TextWriter writer = new StreamWriter(saveFilePath))
+            {
+                XmlSerializer serializer = new XmlSerializer(Paragraphs.GetType());
+                serializer.Serialize(writer, Paragraphs);
+            }
+            if (Title[0].Equals('*'))
+            {
+                Title = Title.Substring(1);
+            }
+        }
+        private bool CanExecuteSaveCommand(object commandParameter)
+        {
+            //If there is an project then you can save, if not you cannot
+            if (paragraphs == null)
+            {
+                return false;
+            }
+            if(title[0].Equals('*'))    //Only checks saves instead of save as so the title being empty won't affect condition check
+            {
+                return true;
+            }
+            return false;
+        }
+        //When user makes change to project and show that the project is in unsaved state
+        private void MakeProjectUnsaved()
+        {
+            if (title[0].Equals('*') == false)
+            {
+                Title = "*" + Title;
+            }
         }
 
         //Add sentence command
         public void ExecuteAddSentenceCommand(object commandParameter)
         {
+            MakeProjectUnsaved();
             paragraphs[paragraphIndex].JpSentences.Insert(sentenceIndex+1, "");
             paragraphs[paragraphIndex].RmjSentences.Insert(sentenceIndex+1, "");
             paragraphs[paragraphIndex].EnSentences.Insert(sentenceIndex+1, "");
@@ -265,7 +326,8 @@ namespace Translation_Organizer
         //Delete Sentence command
         public void ExecuteDeleteSentenceCommand(object commandParameter)
         {
-            if(sentenceIndex == paragraphs[paragraphIndex].JpSentences.Count - 1)
+            MakeProjectUnsaved();
+            if (sentenceIndex == paragraphs[paragraphIndex].JpSentences.Count - 1)
             {
                 paragraphs[paragraphIndex].JpSentences.RemoveAt(sentenceIndex);
                 paragraphs[paragraphIndex].RmjSentences.RemoveAt(sentenceIndex);
@@ -315,12 +377,14 @@ namespace Translation_Organizer
         //Add paragraph/ delete paragraph commands
         public void ExecuteAddParagraphCommand(object commandParameter)
         {
+            MakeProjectUnsaved();
             paragraphs.Insert(paragraphIndex + 1, new ParagraphModel());
             ParagraphIndex++;
         }
         public void ExecuteDeleteParagraphCommand(object commandParameter)
         {
-            if(paragraphIndex == paragraphs.Count - 1)
+            MakeProjectUnsaved();
+            if (paragraphIndex == paragraphs.Count - 1)
             {
                 paragraphs.RemoveAt(paragraphIndex);
                 ParagraphIndex--;

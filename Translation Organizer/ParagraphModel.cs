@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 
 namespace Translation_Organizer
 {
-    internal class ParagraphModel : INotifyPropertyChanged
+    public class ParagraphModel : INotifyPropertyChanged
     {
         private readonly ObservableCollection<string> jpSentences;
         private readonly ObservableCollection<string> rmjSentences;

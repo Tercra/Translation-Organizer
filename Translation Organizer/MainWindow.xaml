@@ -8,7 +8,6 @@
         Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
     <Window.Resources>
         <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
-        <local:IndicesToSentenceConverter x:Key="IndicesToSentenceConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -20,9 +19,9 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Menu Grid.ColumnSpan="2">
-            <MenuItem Header="_New" Command="{Binding NewCommand}"/>
+            <MenuItem Header="_New" Click="NewMenuItem_Click"/>
+            <MenuItem Header="_Save" Click="SaveMenuItem_Click"/>
             <MenuItem Header="_Open"/>
-            <MenuItem Header="_Save"/>
         </Menu>
         <ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
