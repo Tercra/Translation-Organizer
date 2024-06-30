@@ -46,6 +46,7 @@ namespace Translation_Organizer
                     paragraphIndex = value;
                     SentenceIndex = 0;
                     this.NotifyPropertyChanged(nameof(ParagraphIndex));
+                    this.NotifyPropertyChanged(nameof(SelectedParagraph));
                     deleteParagraphCommand.InvokeCanExecuteChanged();
                 }
             }
@@ -132,6 +133,17 @@ namespace Translation_Organizer
                 MakeProjectUnsaved();
             }
         }
+        public ObservableCollection<string> SelectedParagraph
+        {
+            get
+            {
+                if(paragraphs == null)
+                {
+                    return null;
+                }
+                return paragraphs[paragraphIndex].JpSentences;
+            }
+        }
 
 
 
@@ -140,6 +152,8 @@ namespace Translation_Organizer
         private CommandHandler newCommand;
         private CommandHandler saveAsCommand;
         private CommandHandler saveCommand;
+        private CommandHandler openCommand;
+        private CommandHandler blankOpenCommand;
         private CommandHandler addSentenceCommand;
         private CommandHandler deleteSentenceCommand;
         private CommandHandler prevSentenceCommand;
@@ -162,6 +176,14 @@ namespace Translation_Organizer
         public ICommand SaveCommand
         {
             get { return saveCommand; }
+        }
+        public ICommand OpenCommand
+        {
+            get { return openCommand; }
+        }
+        public ICommand BlankOpenCommand
+        {
+            get { return blankOpenCommand; }
         }
         public ICommand AddSentenceCommand
         {
@@ -191,10 +213,12 @@ namespace Translation_Organizer
         //Constructor
         public ViewModel()
         {
-            blankNewCommand = new CommandHandler(ExecuteNewCommand, CanExecuteBlankNewCommand);
+            blankNewCommand = new CommandHandler(ExecuteNewCommand, CanExecuteNoProjectCommand);
             newCommand = new CommandHandler(ExecuteNewCommand);
             saveAsCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveAsCommand);
             saveCommand = new CommandHandler(ExecuteSaveCommand, CanExecuteSaveCommand);
+            openCommand = new CommandHandler(ExecuteOpenCommand);
+            blankOpenCommand = new CommandHandler(ExecuteOpenCommand, CanExecuteNoProjectCommand);
             addSentenceCommand = new CommandHandler(ExecuteAddSentenceCommand, CanExecuteIfProjectCommand);
             deleteSentenceCommand = new CommandHandler(ExecuteDeleteSentenceCommand, CanExecuteDeleteSentenceCommand);
             prevSentenceCommand = new CommandHandler(ExecutePrevSentenceCommand, CanExecutePrevSentenceCommand);
@@ -243,7 +267,7 @@ namespace Translation_Organizer
 
         //NewCommand Functions
         //The Newcommand  condition that fires when there is no existing project
-        private bool CanExecuteBlankNewCommand(object commandParameter)
+        private bool CanExecuteNoProjectCommand(object commandParameter)
         {
             if(paragraphs == null)
             {
@@ -256,7 +280,9 @@ namespace Translation_Organizer
         {
             Title = "*";
             saveFilePath = "";
+            ParagraphIndex = 0;
             Paragraphs = new ObservableCollection<ParagraphModel>() { new ParagraphModel() };
+            Paragraphs[0].Init();
             ParagraphIndex = 0;
         }
 
@@ -310,6 +336,25 @@ namespace Translation_Organizer
             if (title[0].Equals('*') == false)
             {
                 Title = "*" + Title;
+            }
+        }
+
+        //Open Project Command
+        private void ExecuteOpenCommand(object commandParameter)
+        {
+            OpenFileDialog openFileDialog = (OpenFileDialog)commandParameter;
+            using(TextReader reader = new StreamReader(openFileDialog.FileName))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<ParagraphModel>));
+                var temp = serializer.Deserialize(reader);
+                if(temp != null)
+                {
+                    ParagraphIndex = 0;
+                    Paragraphs = (ObservableCollection<ParagraphModel>)temp;
+                    Title = openFileDialog.SafeFileName;
+                    saveFilePath = openFileDialog.FileName;
+                    ParagraphIndex = 0;
+                }
             }
         }
 
@@ -379,6 +424,7 @@ namespace Translation_Organizer
         {
             MakeProjectUnsaved();
             paragraphs.Insert(paragraphIndex + 1, new ParagraphModel());
+            Paragraphs[paragraphIndex + 1].Init();
             ParagraphIndex++;
         }
         public void ExecuteDeleteParagraphCommand(object commandParameter)

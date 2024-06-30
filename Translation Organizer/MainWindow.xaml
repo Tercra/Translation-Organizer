@@ -21,7 +21,7 @@
         <Menu Grid.ColumnSpan="2">
             <MenuItem Header="_New" Click="NewMenuItem_Click"/>
             <MenuItem Header="_Save" Click="SaveMenuItem_Click"/>
-            <MenuItem Header="_Open"/>
+            <MenuItem Header="_Open" Click="OpenMenuItem_Click"/>
         </Menu>
         <ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
@@ -43,7 +43,7 @@
                 </DockPanel.Resources>
                 <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left" Command="{Binding PrevSentenceCommand}"/>
                 <Button Content="Next Sentence (_L)" DockPanel.Dock="Right" Command="{Binding NextSentenceCommand}"/>
-                <ComboBox VerticalAlignment="Center" ItemsSource="{Binding ElementName=paragraphListBox, Path=SelectedItem.JpSentences}" SelectedIndex="{Binding SentenceIndex}"/>
+                <ComboBox VerticalAlignment="Center" ItemsSource="{Binding SelectedParagraph}" SelectedIndex="{Binding SentenceIndex}"/>
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">
                 <Button Content="Delete Sentence (_Z)" DockPanel.Dock="Left" Command="{Binding DeleteSentenceCommand}"/>

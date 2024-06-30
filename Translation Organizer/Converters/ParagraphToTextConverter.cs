@@ -16,7 +16,7 @@ namespace Translation_Organizer
             StringBuilder s = new StringBuilder();
             foreach(string sentence in  paragraph)
             {
-                s.Append(sentence);
+                s.Append(sentence + " ");
             }
 
             return s.ToString();
