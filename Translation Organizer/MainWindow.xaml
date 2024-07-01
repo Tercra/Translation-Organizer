@@ -8,6 +8,7 @@
         Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
     <Window.Resources>
         <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
+        <local:ParagraphToIndexConverter x:Key="ParagraphToIndexConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -23,13 +24,78 @@
             <MenuItem Header="_Save" Click="SaveMenuItem_Click"/>
             <MenuItem Header="_Open" Click="OpenMenuItem_Click"/>
         </Menu>
-        <ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <!--<ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-        </ListBox>
+        </ListBox>-->
+        <TabControl Grid.Row="1">
+            <TabItem Header="Japanese">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Border BorderBrush="SlateGray" BorderThickness="0,0,1,0" Margin="0,0,5,0">
+                                    <Label Foreground="LightSlateGray">
+                                        <Label.Content>
+                                            <MultiBinding Converter="{StaticResource ParagraphToIndexConverter}">
+                                                <Binding Path="ItemsSource" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                                                <Binding Path=""/>
+                                            </MultiBinding>
+                                        </Label.Content>
+                                    </Label>
+                                </Border>
+                                <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+            <TabItem Header="Romaji">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Border BorderBrush="SlateGray" BorderThickness="0,0,1,0" Margin="0,0,5,0">
+                                    <Label Foreground="LightSlateGray">
+                                        <Label.Content>
+                                            <MultiBinding Converter="{StaticResource ParagraphToIndexConverter}">
+                                                <Binding Path="ItemsSource" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                                                <Binding Path=""/>
+                                            </MultiBinding>
+                                        </Label.Content>
+                                    </Label>
+                                </Border>
+                                <TextBlock Text="{Binding RmjSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+            <TabItem Header="English">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Border BorderBrush="SlateGray" BorderThickness="0,0,1,0" Margin="0,0,5,0">
+                                    <Label Foreground="LightSlateGray">
+                                        <Label.Content>
+                                            <MultiBinding Converter="{StaticResource ParagraphToIndexConverter}">
+                                                <Binding Path="ItemsSource" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                                                <Binding Path=""/>
+                                            </MultiBinding>
+                                        </Label.Content>
+                                    </Label>
+                                </Border>
+                                <TextBlock Text="{Binding EnSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+        </TabControl>
         <DockPanel Grid.Row="1" Grid.Column="1">
             <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="10 5 10 0">
                 <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left" Command="{Binding DeleteParagraphCommand}"/>
