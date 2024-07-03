@@ -23,14 +23,9 @@
             <MenuItem Header="_New" Click="NewMenuItem_Click"/>
             <MenuItem Header="_Save" Click="SaveMenuItem_Click"/>
             <MenuItem Header="_Open" Click="OpenMenuItem_Click"/>
+            <MenuItem Header="Ex_port English" Click="ExportMenuItem_Click"/>
         </Menu>
-        <!--<ListBox Grid.Row="1" Name="paragraphListBox" Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>-->
+        
         <TabControl Grid.Row="1">
             <TabItem Header="Japanese">
                 <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -96,11 +91,13 @@
                 </ListBox>
             </TabItem>
         </TabControl>
+        
         <DockPanel Grid.Row="1" Grid.Column="1">
             <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="10 5 10 0">
                 <Button Content="Delete Paragraph (_D)" DockPanel.Dock="Left" Command="{Binding DeleteParagraphCommand}"/>
                 <Button Content="Add Paragraph (_F)" DockPanel.Dock="Right" Command="{Binding AddParagraphCommand}"/>
             </DockPanel>
+            
             <DockPanel DockPanel.Dock="Bottom">
                 <DockPanel.Resources>
                     <Style TargetType="{x:Type Button}">
@@ -111,10 +108,12 @@
                 <Button Content="Next Sentence (_L)" DockPanel.Dock="Right" Command="{Binding NextSentenceCommand}"/>
                 <ComboBox VerticalAlignment="Center" ItemsSource="{Binding SelectedParagraph}" SelectedIndex="{Binding SentenceIndex}"/>
             </DockPanel>
+            
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">
                 <Button Content="Delete Sentence (_Z)" DockPanel.Dock="Left" Command="{Binding DeleteSentenceCommand}"/>
                 <Button Content="Add Sentence (_X)" DockPanel.Dock="Right" Command="{Binding AddSentenceCommand}"/>
             </DockPanel>
+            
             <Grid>
                 <Grid.Resources>
                     <Style TargetType="{x:Type Grid}">

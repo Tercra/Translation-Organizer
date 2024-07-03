@@ -82,6 +82,7 @@ namespace Translation_Organizer
                 nextSentenceCommand.InvokeCanExecuteChanged();
                 addParagraphCommand.InvokeCanExecuteChanged();
                 deleteParagraphCommand.InvokeCanExecuteChanged();
+                exportCommand.InvokeCanExecuteChanged();
             }
         }
         //Wrapper Properties (In order to bind to selected items)
@@ -160,6 +161,7 @@ namespace Translation_Organizer
         private CommandHandler nextSentenceCommand;
         private CommandHandler addParagraphCommand;
         private CommandHandler deleteParagraphCommand;
+        private CommandHandler exportCommand;
 
         public ICommand BlankNewCommand
         {
@@ -209,6 +211,10 @@ namespace Translation_Organizer
         {
             get { return deleteParagraphCommand; }
         }
+        public ICommand ExportCommand
+        {
+            get { return exportCommand; }
+        }
 
         //Constructor
         public ViewModel()
@@ -225,6 +231,7 @@ namespace Translation_Organizer
             nextSentenceCommand = new CommandHandler(ExecuteNextSentenceCommand, CanExecuteNextSentenceCommand);
             addParagraphCommand = new CommandHandler(ExecuteAddParagraphCommand, CanExecuteIfProjectCommand);
             deleteParagraphCommand = new CommandHandler(ExecuteDeleteParagraphCommand, CanExecuteDeleteParagraphCommand);
+            exportCommand = new CommandHandler(ExecuteExportCommand, CanExecuteIfProjectCommand);
         }
 
         private class CommandHandler : ICommand
@@ -447,6 +454,20 @@ namespace Translation_Organizer
                 return false;
             }
             return true;
+        }
+
+        //Export to English command
+        public void ExecuteExportCommand(object commandParameter)
+        {
+            string filePath = (string)commandParameter;
+            ParagraphToTextConverter converter = new ParagraphToTextConverter();
+            using(StreamWriter writer = File.CreateText(filePath))
+            {
+                foreach(ParagraphModel p in paragraphs)
+                {
+                    writer.WriteLine(converter.Convert(p.EnSentences, null, null, null));
+                }
+            }
         }
 
 

@@ -163,5 +163,27 @@ namespace Translation_Organizer
                 }
             }
         }
+
+        private void ExportMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as ViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+            if (!viewModel.ExportCommand.CanExecute(null))
+            {
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = "ExportProject";
+            saveFileDialog.DefaultExt = ".txt";
+            saveFileDialog.Filter = "Text Files (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                viewModel.ExportCommand.Execute(saveFileDialog.FileName);
+            }
+        }
     }
 }
