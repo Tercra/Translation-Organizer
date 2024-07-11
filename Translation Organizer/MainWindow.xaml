@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Translation_Organizer"
         mc:Ignorable="d"
-        Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="1200">
+        Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="500" Width="1200">
     <Window.Resources>
         <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
         <local:ParagraphToIndexConverter x:Key="ParagraphToIndexConverter"/>
@@ -31,7 +31,7 @@
             <MenuItem Header="_Open" Command="ApplicationCommands.Open"/>
             <MenuItem Header="Ex_port English" Click="ExportMenuItem_Click"/>
         </Menu>
-        
+
         <TabControl Grid.Row="1">
             <TabItem Header="Japanese">
                 <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -48,7 +48,7 @@
                                         </Label.Content>
                                     </Label>
                                 </Border>
-                                <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding JpSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap" FontSize="15"/>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -69,7 +69,7 @@
                                         </Label.Content>
                                     </Label>
                                 </Border>
-                                <TextBlock Text="{Binding RmjSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding RmjSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap" FontSize="15"/>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -90,7 +90,7 @@
                                         </Label.Content>
                                     </Label>
                                 </Border>
-                                <TextBlock Text="{Binding EnSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding EnSentences, Converter={StaticResource ParagraphToTextConverter}}" TextWrapping="Wrap" FontSize="15"/>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -127,6 +127,7 @@
                     </Style>
                     <Style TargetType="{x:Type TextBox}">
                         <Setter Property="IsEnabled" Value="True"/>
+                        <Setter Property="FontSize" Value="15"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Paragraphs}" Value="{x:Null}">
                                 <Setter Property="IsEnabled" Value="False"/>
