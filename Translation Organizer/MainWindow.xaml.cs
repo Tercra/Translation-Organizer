@@ -185,5 +185,20 @@ namespace Translation_Organizer
                 viewModel.ExportCommand.Execute(saveFileDialog.FileName);
             }
         }
+
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            NewMenuItem_Click(sender, e);
+        }
+
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SaveMenuItem_Click(sender, e);
+        }
+
+        private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            OpenMenuItem_Click(sender, e);
+        }
     }
 }

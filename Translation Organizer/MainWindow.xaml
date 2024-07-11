@@ -5,13 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Translation_Organizer"
         mc:Ignorable="d"
-        Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="800">
+        Title="{Binding Title, StringFormat=Translation Organizer - {0}}" Height="450" Width="1200">
     <Window.Resources>
         <local:ParagraphToTextConverter x:Key="ParagraphToTextConverter"/>
         <local:ParagraphToIndexConverter x:Key="ParagraphToIndexConverter"/>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Save" Executed="SaveCommand_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="OpenCommand_Executed"/>
+    </Window.CommandBindings>
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
@@ -20,9 +26,9 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Menu Grid.ColumnSpan="2">
-            <MenuItem Header="_New" Click="NewMenuItem_Click"/>
-            <MenuItem Header="_Save" Click="SaveMenuItem_Click"/>
-            <MenuItem Header="_Open" Click="OpenMenuItem_Click"/>
+            <MenuItem Header="_New" Command="ApplicationCommands.New"/>
+            <MenuItem Header="_Save" Command="ApplicationCommands.Save"/>
+            <MenuItem Header="_Open" Command="ApplicationCommands.Open"/>
             <MenuItem Header="Ex_port English" Click="ExportMenuItem_Click"/>
         </Menu>
         
@@ -145,5 +151,7 @@
                 <TextBox Name="enText" TextWrapping="Wrap" Grid.Row="5" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Text="{Binding SelectedEnSentence, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </DockPanel>
+
+        <WebBrowser Name="JishoWeb" Grid.Row="1" Grid.Column="2" Source="https://jisho.org/"/>
     </Grid>
 </Window>
