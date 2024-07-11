@@ -22,6 +22,18 @@ namespace Translation_Organizer
             ViewModel viewModel = new ViewModel();
             DataContext = viewModel;
             InitializeComponent();
+
+            EventManager.RegisterClassHandler(typeof(UIElement), AccessKeyManager.AccessKeyPressedEvent,
+                                        new AccessKeyPressedEventHandler(OnAccessKeyPressed));
+        }
+
+        private static void OnAccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) != ModifierKeys.Alt)
+            {
+                e.Target = null;
+                e.Handled = true;
+            }
         }
 
         private void NewMenuItem_Click(object sender, RoutedEventArgs e)
