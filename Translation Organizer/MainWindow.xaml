@@ -34,7 +34,7 @@
 
         <TabControl Grid.Row="1">
             <TabItem Header="_1) Japanese">
-                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel>
@@ -55,7 +55,7 @@
                 </ListBox>
             </TabItem>
             <TabItem Header="_2) Romaji">
-                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel>
@@ -76,7 +76,7 @@
                 </ListBox>
             </TabItem>
             <TabItem Header="_3) English">
-                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox Background="AliceBlue" ItemsSource="{Binding Paragraphs}" SelectedIndex="{Binding ParagraphIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel>
@@ -112,7 +112,13 @@
                 </DockPanel.Resources>
                 <Button Content="Previous Sentence (_K)" DockPanel.Dock="Left" Command="{Binding PrevSentenceCommand}"/>
                 <Button Content="Next Sentence (_L)" DockPanel.Dock="Right" Command="{Binding NextSentenceCommand}"/>
-                <ComboBox VerticalAlignment="Center" ItemsSource="{Binding SelectedParagraph}" SelectedIndex="{Binding SentenceIndex}"/>
+                <ComboBox Name="SentenceList" VerticalAlignment="Center" ItemsSource="{Binding SelectedParagraph}" SelectedIndex="{Binding SentenceIndex}">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}, Path=ActualWidth}"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
             </DockPanel>
             
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="10 0 10 5">
